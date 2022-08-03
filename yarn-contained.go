@@ -22,6 +22,8 @@ var (
 )
 
 func main() {
+	log.Printf("using yarn-contained: https://github.com/jamesrr39/yarn-contained\n")
+
 	var err error
 	flag.Parse()
 
@@ -36,7 +38,7 @@ func main() {
 		errorsx.ExitIfErr(err)
 
 		if !yarnLockExists {
-			log.Fatalf("%s does not exist in the current working directory\n", yarnLockFilename)
+			log.Fatalf("%s does not exist in the current working directory and the command was not 'init'. Exiting.\n", yarnLockFilename)
 		}
 	}
 
@@ -44,7 +46,6 @@ func main() {
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 
 	yarnArgs := os.Args[1:]
-	log.Printf("%#v\n", yarnArgs)
 
 	workingDir, err := os.Getwd()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
