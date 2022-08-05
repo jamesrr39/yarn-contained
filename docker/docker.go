@@ -76,7 +76,6 @@ func (ds *DockerService) CreateDockerImage(imageName string) errorsx.Error {
 const containerWorkingDir = "/opt/yarn-contained/workspace"
 
 func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []string, hostUID string) errorsx.Error {
-
 	dockerArgs := []string{
 		"run",
 		"--rm",
@@ -101,3 +100,48 @@ func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []strin
 
 	return nil
 }
+
+/*
+	cmd := exec.Command(ds.DockerTool, dockerArgs...)
+	cmd.Stderr = os.Stderr
+	stdin, err := cmd.StdinPipe()
+	if nil != err {
+		return errorsx.Wrap(err)
+	}
+	defer stdin.Close()
+	stdout, err := cmd.StdoutPipe()
+	if nil != err {
+		return errorsx.Wrap(err)
+	}
+
+	osInReader := bufio.NewScanner(os.Stdin)
+	go func() {
+		for osInReader.Scan() {
+			_, err := io.Copy(stdin, bytes.NewBufferString(osInReader.Text()))
+			if err != nil {
+				panic(err)
+			}
+		}
+	}()
+
+	reader := bufio.NewReader(stdout)
+	go func(reader io.Reader) {
+		scanner := bufio.NewScanner(reader)
+		for scanner.Scan() {
+			log.Printf("Reading from subprocess: %s", scanner.Text())
+			osInReader.Scan()
+			stdin.Write(osInReader.Bytes())
+		}
+	}(reader)
+
+	err = cmd.Start()
+	if err != nil {
+		return errorsx.Wrap(err)
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return errorsx.Wrap(err)
+	}
+
+*/

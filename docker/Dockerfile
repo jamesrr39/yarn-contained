@@ -17,7 +17,11 @@ adduser -D -u \${HOST_USER_ID} \${USERNAME}\n\
 \n\
 chown -R \${HOST_USER_ID} /opt/yarn-contained/workspace\n\
 \n\
-runuser -l \${USERNAME} -c 'cd /opt/yarn-contained/workspace && yarn \$@'\n\
+echo args: \$@\n\
+\n\
+YARN_CMD=\$@\n\
+\n\
+runuser -l \${USERNAME} -c \"cd /opt/yarn-contained/workspace && \${YARN_CMD}\"\n\
 \n\
 \n\
 " > /opt/start.sh

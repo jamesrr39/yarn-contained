@@ -33,7 +33,12 @@ func main() {
 
 	dockerService := docker.NewDockerService(envString(DockerToolEnvVarName, dockerTool))
 
-	if subCommand != "init" {
+	yarnArgs := os.Args[1:]
+
+	switch subCommand {
+	case "init":
+		yarnArgs = append(yarnArgs, "--yes")
+	default:
 		yarnLockExists, err := checkForYarnLock()
 		errorsx.ExitIfErr(err)
 
@@ -45,8 +50,6 @@ func main() {
 	err = dockerService.EnsureDockerImage(DockerImageName, forceDockerRebuild)
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 
-	yarnArgs := os.Args[1:]
-
 	workingDir, err := os.Getwd()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 
@@ -55,7 +58,6 @@ func main() {
 
 	err = dockerService.RunImage(DockerImageName, workingDir, yarnArgs, hostUser.Uid)
 	errorsx.ExitIfErr(errorsx.Wrap(err))
-
 }
 
 func checkForYarnLock() (bool, errorsx.Error) {
