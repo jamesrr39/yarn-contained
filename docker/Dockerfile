@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk update && apk add yarn runuser
+RUN apk update && apk add yarn runuser git
 
 RUN mkdir -p /opt
 
@@ -17,9 +17,9 @@ adduser -D -u \${HOST_USER_ID} \${USERNAME}\n\
 \n\
 chown -R \${HOST_USER_ID} /opt/yarn-contained/workspace\n\
 \n\
-echo args: \$@\n\
-\n\
 YARN_CMD=\$@\n\
+\n\
+echo \"running yarn cmd: ${YARN_CMD}\"\n\
 \n\
 runuser -l \${USERNAME} -c \"cd /opt/yarn-contained/workspace && \${YARN_CMD}\"\n\
 \n\

@@ -15,6 +15,7 @@ const (
 	DockerImageName                   = "jamesrr39/yarncontained"
 	ForceDockerImageRebuildEnvVarName = "YARN_CONTAINED_FORCE_DOCKER_BUILD"
 	DockerToolEnvVarName              = "YARN_CONTAINED_DOCKERTOOL"
+	ProjectURL                        = "https://github.com/jamesrr39/yarn-contained"
 )
 
 var (
@@ -22,7 +23,7 @@ var (
 )
 
 func main() {
-	log.Printf("using yarn-contained: https://github.com/jamesrr39/yarn-contained\n")
+	log.Printf("using yarn-contained: %s\n", ProjectURL)
 
 	var err error
 	flag.Parse()
@@ -37,13 +38,16 @@ func main() {
 
 	switch subCommand {
 	case "init":
+		if len(yarnArgs) != 1 {
+			log.Fatalln("sorry, yarn init with extra arguments is currently not supported. Please use just 'yarn init' and then edit package.json by hand")
+		}
 		yarnArgs = append(yarnArgs, "--yes")
 	default:
-		yarnLockExists, err := checkForYarnLock()
+		yarnLockExists, err := checkForPackageJson()
 		errorsx.ExitIfErr(err)
 
 		if !yarnLockExists {
-			log.Fatalf("%s does not exist in the current working directory and the command was not 'init'. Exiting.\n", yarnLockFilename)
+			log.Fatalf("%s does not exist in the current working directory and the command was not 'init'. Exiting.\n", packageJsonFilename)
 		}
 	}
 
@@ -60,8 +64,8 @@ func main() {
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 }
 
-func checkForYarnLock() (bool, errorsx.Error) {
-	_, err := os.Stat(yarnLockFilename)
+func checkForPackageJson() (bool, errorsx.Error) {
+	_, err := os.Stat(packageJsonFilename)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
@@ -74,8 +78,8 @@ func checkForYarnLock() (bool, errorsx.Error) {
 }
 
 const (
-	yarnLockFilename = "yarn.lock"
-	dockerTool       = "docker"
+	packageJsonFilename = "package.json"
+	dockerTool          = "docker"
 )
 
 func envBoolean(key string) bool {

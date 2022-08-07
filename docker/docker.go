@@ -79,6 +79,7 @@ func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []strin
 	dockerArgs := []string{
 		"run",
 		"--rm",
+		"-t",
 		"-v", fmt.Sprintf("%s:%s", workingDir, containerWorkingDir),
 		"-e", fmt.Sprintf("USERNAME=user%s", hostUID),
 		"-e", fmt.Sprintf("HOST_USER_ID=%s", hostUID),
