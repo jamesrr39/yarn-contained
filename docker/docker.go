@@ -32,7 +32,6 @@ func (ds *DockerService) EnsureDockerImage(imageName string, forceRebuild bool) 
 
 	if !forceRebuild {
 		cmd := exec.Command(ds.DockerTool, "image", "ls", imageName, "--format={{.ID}}")
-		// cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		output, err := cmd.Output()
 		if err != nil {
