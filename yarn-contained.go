@@ -38,10 +38,10 @@ func main() {
 
 	switch subCommand {
 	case "init":
-		if len(yarnArgs) != 1 {
-			log.Fatalln("sorry, yarn init with extra arguments is currently not supported. Please use just 'yarn init' and then edit package.json by hand")
-		}
-		yarnArgs = append(yarnArgs, "--yes")
+		// if len(yarnArgs) != 1 {
+		// 	log.Fatalln("sorry, yarn init with extra arguments is currently not supported. Please use just 'yarn init' and then edit package.json by hand")
+		// }
+		// yarnArgs = append(yarnArgs, "--yes")
 	default:
 		yarnLockExists, err := checkForPackageJson()
 		errorsx.ExitIfErr(err)
