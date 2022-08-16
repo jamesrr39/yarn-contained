@@ -9,3 +9,11 @@ Here is a presentation I gave about it: [https://jamesrr39.github.io/talks/yarn-
 ## Install
 
 go install github.com/jamesrr39/yarn-contained@latest
+
+## Limitations
+
+- As environment variables, e.g. `NPM_TOKEN` are not carried into the container, dependencies from private NPM repositories cannot be fetched. This also applies to other private repositories or git remotes requiring authorization.
+
+## Contributions
+
+Pull requests welcome for small fixes, for features please open an issue to discuss the feature first.
