@@ -13,6 +13,7 @@ go install github.com/jamesrr39/yarn-contained@latest
 ## Limitations
 
 - As environment variables, e.g. `NPM_TOKEN` are not carried into the container, dependencies from private NPM repositories cannot be fetched. This also applies to other private repositories or git remotes requiring authorization.
+- Currently `yarn init` is not interactive, so to set properties such as name, version, main and license, you must run `yarn init`, and then edit the `package.json` file by hand.
 
 ## Contributions
 
