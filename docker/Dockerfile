@@ -19,8 +19,6 @@ chown -R \${HOST_USER_ID} /opt/yarn-contained/workspace\n\
 \n\
 YARN_CMD=\$@\n\
 \n\
-echo \"running yarn cmd: ${YARN_CMD}\"\n\
-\n\
 runuser -l \${USERNAME} -c \"cd /opt/yarn-contained/workspace && \${YARN_CMD}\"\n\
 \n\
 \n\
