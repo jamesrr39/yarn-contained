@@ -10,6 +10,12 @@ Here is a presentation I gave about it: [https://jamesrr39.github.io/talks/yarn-
 
 go install github.com/jamesrr39/yarn-contained@latest
 
+## Features
+
+- Increased security due to isolation.
+- `yarn` in container is run by as an ordinary user, not by root, therefore reducing the attack surface.
+- Refuses to run any other command than `init` if the directory doesn't contain `package.json` - a relief to those who have accidentally run `yarn` in their home directory, for example!
+
 ## Limitations
 
 - As environment variables, e.g. `NPM_TOKEN` are not carried into the container, dependencies from private NPM repositories cannot be fetched. This also applies to other private repositories or git remotes requiring authorization.
