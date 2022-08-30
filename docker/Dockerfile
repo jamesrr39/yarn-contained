@@ -31,6 +31,4 @@ RUN cat /opt/start.sh
 
 RUN adduser -D user
 
-# COPY start.sh /opt/start.sh
-
 ENTRYPOINT ["/opt/start.sh"]
