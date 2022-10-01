@@ -7,9 +7,9 @@ The application is in its early days as of August 2022. It works best on Linux, 
 Here is a presentation I gave about it: [https://jamesrr39.github.io/talks/yarn-contained-talk/yarn-contained-talk.html](https://jamesrr39.github.io/talks/yarn-contained-talk/yarn-contained-talk.html#1)
 
 ## Install
-
+```
 go install github.com/jamesrr39/yarn-contained@latest
-
+```
 ## Features
 
 - Increased security due to isolation.
