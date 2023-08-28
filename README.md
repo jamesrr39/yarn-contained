@@ -7,8 +7,14 @@ The application works well enough for day-to-day use in August 2023 on Linux. It
 Here is a presentation I gave about it: [https://jamesrr39.github.io/talks/yarn-contained-talk/yarn-contained-talk.html](https://jamesrr39.github.io/talks/yarn-contained-talk/yarn-contained-talk.html#1)
 
 ## Install
-
+```
 go install github.com/jamesrr39/yarn-contained@latest
+```
+## Features
+
+- Increased security due to isolation.
+- `yarn` in container is run by as an ordinary user, not by root, therefore reducing the attack surface.
+- Refuses to run any other command than `init` if the directory doesn't contain `package.json` - a relief to those who have accidentally run `yarn` in their home directory, for example!
 
 ## Limitations
 
