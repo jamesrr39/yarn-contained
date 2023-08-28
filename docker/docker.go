@@ -98,44 +98,6 @@ func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []strin
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
-	// stdinPipe, err := cmd.StdinPipe()
-	// if err != nil {
-	// 	return errorsx.Wrap(err)
-	// }
-	// defer stdinPipe.Close()
-
-	// go func() {
-	// 	stdinScanner := bufio.NewScanner(os.Stdin)
-	// 	for stdinScanner.Scan() {
-	// 		b := stdinScanner.Bytes()
-
-	// 		log.Printf("READ: %s\n", b)
-	// 		_, err = stdinPipe.Write(append(b, []byte("\n")...))
-	// 		if err != nil {
-	// 			panic(errorsx.Wrap(err))
-	// 		}
-	// 	}
-
-	// 	err = stdinScanner.Err()
-	// 	if err != nil {
-	// 		panic(errorsx.Wrap(err))
-	// 	}
-	// }()
-
-	// go func() {
-	// 	for {
-	// 		time.Sleep(time.Second * 2)
-	// 		_, err := stdinPipe.Write([]byte("y\n"))
-	// 		if err != nil {
-	// 			panic(errorsx.Wrap(err))
-	// 		}
-
-	// 		// _, err = cmd.Stdout.Write([]byte("y\n"))
-	// 		// if err != nil {
-	// 		// 	panic(errorsx.Wrap(err))
-	// 		// }
-	// 	}
-	// }()
 
 	err := cmd.Run()
 	if err != nil {
