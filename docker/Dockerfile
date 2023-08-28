@@ -10,19 +10,21 @@ RUN mkdir -p /opt/yarn-contained/workspace
 # - end every line with \n\
 # - escape variables with backslash, e.g. \${MY_VAR}
 RUN echo -e "#!/bin/sh\n\
-\n\
-# check user exists\n\
-\n\
-adduser -D -u \${HOST_USER_ID} \${USERNAME}\n\
-\n\
-chown -R \${HOST_USER_ID} /opt/yarn-contained/workspace\n\
-\n\
-YARN_CMD=\$@\n\
-\n\
-runuser -l \${USERNAME} -c \"cd /opt/yarn-contained/workspace && \${YARN_CMD}\"\n\
-\n\
-\n\
-" > /opt/start.sh
+    \n\
+    set -e\n\
+    \n\
+    # check user exists\n\
+    \n\
+    adduser -D -u \${HOST_USER_ID} \${USERNAME}\n\
+    \n\
+    chown -R \${HOST_USER_ID} /opt/yarn-contained/workspace\n\
+    \n\
+    YARN_CMD=\$@\n\
+    \n\
+    runuser -l \${USERNAME} -c \"cd /opt/yarn-contained/workspace && pwd && echo \${YARN_CMD} && \${YARN_CMD}\"\n\
+    \n\
+    \n\
+    " > /opt/start.sh
 
 RUN chmod +x /opt/start.sh
 RUN ls -lh /opt/start.sh

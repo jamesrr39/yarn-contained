@@ -15,11 +15,13 @@ const (
 	DockerImageName                   = "jamesrr39/yarncontained"
 	ForceDockerImageRebuildEnvVarName = "YARN_CONTAINED_FORCE_DOCKER_BUILD"
 	DockerToolEnvVarName              = "YARN_CONTAINED_DOCKERTOOL"
+	DockerPortForwardVarName          = "YARN_CONTAINED_PORT_FORWARD"
 	ProjectURL                        = "https://github.com/jamesrr39/yarn-contained"
 )
 
 var (
 	forceDockerRebuild bool
+	portForward        string
 )
 
 func main() {
@@ -29,6 +31,7 @@ func main() {
 	flag.Parse()
 
 	forceDockerRebuild = envBoolean(ForceDockerImageRebuildEnvVarName)
+	portForward = envString(DockerPortForwardVarName, "")
 
 	subCommand := flag.Arg(0)
 
@@ -37,11 +40,8 @@ func main() {
 	yarnArgs := os.Args[1:]
 
 	switch subCommand {
-	case "init":
-		if len(yarnArgs) != 1 {
-			log.Fatalln("sorry, yarn init with extra arguments is currently not supported. Please use just 'yarn init' and then edit package.json by hand")
-		}
-		yarnArgs = append(yarnArgs, "--yes")
+	case "init", "create":
+		// continue without package.json, since these commands will create package.json
 	default:
 		yarnLockExists, err := checkForPackageJson()
 		errorsx.ExitIfErr(err)
@@ -60,7 +60,7 @@ func main() {
 	hostUser, err := user.Current()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 
-	err = dockerService.RunImage(DockerImageName, workingDir, yarnArgs, hostUser.Uid)
+	err = dockerService.RunImage(DockerImageName, workingDir, yarnArgs, hostUser.Uid, portForward)
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 }
 
