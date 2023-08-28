@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"os/exec"
 	"os/user"
 	"strings"
 
@@ -35,7 +36,12 @@ func main() {
 
 	subCommand := flag.Arg(0)
 
-	dockerService := docker.NewDockerService(envString(DockerToolEnvVarName, dockerTool))
+	dockerTool, err := getDockerTool()
+	errorsx.ExitIfErr(errorsx.Wrap(err))
+
+	log.Printf("using %q as the docker tool\n", dockerTool)
+
+	dockerService := docker.NewDockerService(dockerTool)
 
 	yarnArgs := os.Args[1:]
 
@@ -79,8 +85,32 @@ func checkForPackageJson() (bool, errorsx.Error) {
 
 const (
 	packageJsonFilename = "package.json"
-	dockerTool          = "docker"
 )
+
+func getDockerTool() (string, errorsx.Error) {
+	chosenDockerTool := envString(DockerToolEnvVarName, "")
+	if chosenDockerTool != "" {
+		return chosenDockerTool, nil
+	}
+
+	for _, executable := range []string{"podman", "docker"} {
+		fullPath, err := exec.LookPath(executable)
+
+		if err != nil {
+			_, ok := err.(*exec.Error)
+			if ok {
+				// some error running the executable, maybe it didn't exist, or not enough permissions to run it. Try the next option.
+				continue
+			}
+
+			return "", errorsx.Wrap(err)
+		}
+
+		return fullPath, nil
+	}
+
+	return "", errorsx.Errorf("no suitable docker tool found")
+}
 
 func envBoolean(key string) bool {
 	value := os.Getenv(key)
