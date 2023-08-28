@@ -87,13 +87,17 @@ const (
 	packageJsonFilename = "package.json"
 )
 
+// look for podman first - if someone has podman installed they probably want to use that.
+// then use docker.
+var containerApplications = []string{"podman", "docker"}
+
 func getDockerTool() (string, errorsx.Error) {
 	chosenDockerTool := envString(DockerToolEnvVarName, "")
 	if chosenDockerTool != "" {
 		return chosenDockerTool, nil
 	}
 
-	for _, executable := range []string{"podman", "docker"} {
+	for _, executable := range containerApplications {
 		fullPath, err := exec.LookPath(executable)
 
 		if err != nil {
