@@ -37,7 +37,7 @@ func main() {
 	dockerTool, err := getDockerTool()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 
-	log.Printf("using %q as the docker tool\n", dockerTool)
+	log.Printf("using %q as the container tool\n", dockerTool)
 
 	dockerService := docker.NewDockerService(dockerTool)
 

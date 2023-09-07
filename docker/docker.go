@@ -87,11 +87,8 @@ func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []strin
 		"--rm",
 		"--interactive",
 		"--tty",
-		"--user", hostUser.Uid,
+		"--userns", "keep-id",
 		"-v", fmt.Sprintf("%s:%s", workingDir, containerWorkingDir),
-		// "-e", fmt.Sprintf("USERNAME=user%s", hostUser.Uid),
-		// "-e", fmt.Sprintf("HOST_USER_ID=%s", hostUser.Uid),
-		// "-e", fmt.Sprintf("HOST_GROUP_ID=%s", hostUser.Gid),
 	}
 	for _, envVar := range envVars {
 		dockerArgs = append(dockerArgs, "-e", fmt.Sprintf("%s=%s", envVar.Key, envVar.Value))
