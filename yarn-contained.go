@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 	"os/exec"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/jamesrr39/goutil/errorsx"
 	"github.com/jamesrr39/yarn-contained/docker"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 const (
@@ -17,6 +17,7 @@ const (
 	ForceDockerImageRebuildEnvVarName = "YARN_CONTAINED_FORCE_DOCKER_BUILD"
 	DockerToolEnvVarName              = "YARN_CONTAINED_DOCKERTOOL"
 	DockerPortForwardVarName          = "YARN_CONTAINED_PORT_FORWARD"
+	EnvVarsToForwardVarName           = "YARN_CONTAINED_ENV_VARS" // comma separated, e.g. "NPM_TOKEN,AWS_SECRET_KEY"
 	ProjectURL                        = "https://github.com/jamesrr39/yarn-contained"
 )
 
@@ -29,12 +30,9 @@ func main() {
 	log.Printf("using yarn-contained: %s\n", ProjectURL)
 
 	var err error
-	flag.Parse()
 
 	forceDockerRebuild = envBoolean(ForceDockerImageRebuildEnvVarName)
 	portForward = envString(DockerPortForwardVarName, "")
-
-	subCommand := flag.Arg(0)
 
 	dockerTool, err := getDockerTool()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
@@ -45,9 +43,14 @@ func main() {
 
 	yarnArgs := os.Args[1:]
 
+	subCommand := ""
+	if len(yarnArgs) > 0 {
+		subCommand = yarnArgs[0]
+	}
+
 	switch subCommand {
-	case "init", "create":
-		// continue without package.json, since these commands will create package.json
+	case "init", "create", "--version":
+		// continue without package.json, since these commands do not expect a package.json in the working directory.
 	default:
 		yarnLockExists, err := checkForPackageJson()
 		errorsx.ExitIfErr(err)
@@ -66,7 +69,7 @@ func main() {
 	hostUser, err := user.Current()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 
-	err = dockerService.RunImage(DockerImageName, workingDir, yarnArgs, hostUser.Uid, portForward)
+	err = dockerService.RunImage(DockerImageName, workingDir, yarnArgs, hostUser, portForward, getEnvVarsToForward())
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 }
 
@@ -90,6 +93,28 @@ const (
 // look for podman first - if someone has podman installed they probably want to use that.
 // then use docker.
 var containerApplications = []string{"podman", "docker"}
+
+func getEnvVarsToForward() []docker.EnvironmentVariable {
+	envVarNames := strings.Split(EnvVarsToForwardVarName, ",")
+
+	var envVars []docker.EnvironmentVariable
+
+	for _, envVarName := range envVarNames {
+		envVarName = strings.TrimSpace(envVarName)
+		if envVarName == "" {
+			continue
+		}
+
+		val := os.Getenv(envVarName)
+
+		envVars = append(envVars, docker.EnvironmentVariable{
+			Key:   envVarName,
+			Value: val,
+		})
+	}
+
+	return envVars
+}
 
 func getDockerTool() (string, errorsx.Error) {
 	chosenDockerTool := envString(DockerToolEnvVarName, "")

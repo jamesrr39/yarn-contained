@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/user"
 	"strings"
 
 	"github.com/jamesrr39/goutil/errorsx"
@@ -75,24 +76,34 @@ func (ds *DockerService) CreateDockerImage(imageName string) errorsx.Error {
 	return nil
 }
 
-func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []string, hostUID, portForward string) errorsx.Error {
+type EnvironmentVariable struct {
+	Key, Value string
+}
+
+func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []string, hostUser *user.User, portForward string, envVars []EnvironmentVariable) errorsx.Error {
 
 	dockerArgs := []string{
 		"run",
 		"--rm",
 		"--interactive",
 		"--tty",
+		"--user", hostUser.Uid,
 		"-v", fmt.Sprintf("%s:%s", workingDir, containerWorkingDir),
-		"-e", fmt.Sprintf("USERNAME=user%s", hostUID),
-		"-e", fmt.Sprintf("HOST_USER_ID=%s", hostUID),
+		// "-e", fmt.Sprintf("USERNAME=user%s", hostUser.Uid),
+		// "-e", fmt.Sprintf("HOST_USER_ID=%s", hostUser.Uid),
+		// "-e", fmt.Sprintf("HOST_GROUP_ID=%s", hostUser.Gid),
 	}
+	for _, envVar := range envVars {
+		dockerArgs = append(dockerArgs, "-e", fmt.Sprintf("%s=%s", envVar.Key, envVar.Value))
+	}
+
 	if portForward != "" {
 		dockerArgs = append(dockerArgs, "-p", portForward)
 	}
 	dockerArgs = append(dockerArgs, imageName, "yarn")
 	dockerArgs = append(dockerArgs, yarnArgs...)
 
-	log.Printf("dockerArgs: %s\n", strings.Join(dockerArgs, " "))
+	log.Printf("running yarn with: %q\n", strings.Join(append([]string{ds.DockerTool}, dockerArgs...), " "))
 
 	cmd := exec.Command(ds.DockerTool, dockerArgs...)
 	cmd.Stderr = os.Stderr

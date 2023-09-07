@@ -2,35 +2,6 @@ FROM alpine:latest
 
 RUN apk update && apk add yarn runuser git
 
-RUN mkdir -p /opt
-
 RUN mkdir -p /opt/yarn-contained/workspace
-# feed /opt/start.sh inline so that we don't need to provide a docker build context
-# this is a bit painful, main points:
-# - end every line with \n\
-# - escape variables with backslash, e.g. \${MY_VAR}
-RUN echo -e "#!/bin/sh\n\
-    \n\
-    set -e\n\
-    \n\
-    # check user exists\n\
-    \n\
-    adduser -D -u \${HOST_USER_ID} \${USERNAME}\n\
-    \n\
-    chown -R \${HOST_USER_ID} /opt/yarn-contained/workspace\n\
-    \n\
-    YARN_CMD=\$@\n\
-    \n\
-    runuser -l \${USERNAME} -c \"cd /opt/yarn-contained/workspace && pwd && echo \${YARN_CMD} && \${YARN_CMD}\"\n\
-    \n\
-    \n\
-    " > /opt/start.sh
 
-RUN chmod +x /opt/start.sh
-RUN ls -lh /opt/start.sh
-RUN wc -l /opt/start.sh
-RUN cat /opt/start.sh
-
-RUN adduser -D user
-
-ENTRYPOINT ["/opt/start.sh"]
+WORKDIR /opt/yarn-contained/workspace

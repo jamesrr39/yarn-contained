@@ -12,3 +12,4 @@ remove_image:
 .PHONY: install
 install:
 	go build -trimpath -o ${shell go env GOBIN}/yarn-contained yarn-contained.go
+	YARN_CONTAINED_FORCE_DOCKER_BUILD=1 yarn-contained --version
