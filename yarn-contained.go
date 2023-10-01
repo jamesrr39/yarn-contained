@@ -95,7 +95,7 @@ const (
 var containerApplications = []string{"podman", "docker"}
 
 func getEnvVarsToForward() []docker.EnvironmentVariable {
-	envVarNames := strings.Split(EnvVarsToForwardVarName, ",")
+	envVarNames := strings.Split(os.Getenv(EnvVarsToForwardVarName), ",")
 
 	var envVars []docker.EnvironmentVariable
 
