@@ -1,24 +1,30 @@
 package main
 
 import (
+	"io"
 	"log"
 	"os"
 	"os/exec"
 	"os/user"
 	"strings"
 
-	"github.com/jamesrr39/goutil/errorsx"
+	"github.com/jamesrr39/go-errorsx"
 	"github.com/jamesrr39/yarn-contained/docker"
 	_ "github.com/joho/godotenv/autoload"
 )
 
+// Env variable names
 const (
-	DockerImageName                   = "jamesrr39/yarncontained"
-	ForceDockerImageRebuildEnvVarName = "YARN_CONTAINED_FORCE_DOCKER_BUILD"
-	DockerToolEnvVarName              = "YARN_CONTAINED_DOCKERTOOL"
-	DockerPortForwardVarName          = "YARN_CONTAINED_PORT_FORWARD"
-	EnvVarsToForwardVarName           = "YARN_CONTAINED_ENV_VARS" // comma separated, e.g. "NPM_TOKEN,AWS_SECRET_KEY"
-	ProjectURL                        = "https://github.com/jamesrr39/yarn-contained"
+	EnvVarLoggerLevelVerbose      = "YARN_CONTAINED_VERBOSE_LOGGING"
+	EnvVarForceDockerImageRebuild = "YARN_CONTAINED_FORCE_DOCKER_BUILD"
+	EnvVarDockerTool              = "YARN_CONTAINED_DOCKERTOOL"
+	EnvVarDockerPortForward       = "YARN_CONTAINED_PORT_FORWARD"
+	EnvVarForwardedEnvVars        = "YARN_CONTAINED_ENV_VARS" // comma separated, e.g. "NPM_TOKEN,AWS_SECRET_KEY"
+)
+
+const (
+	DockerImageName = "jamesrr39/yarncontained"
+	ProjectURL      = "https://github.com/jamesrr39/yarn-contained"
 )
 
 var (
@@ -26,13 +32,23 @@ var (
 	portForward        string
 )
 
+func getLoggerWriter() io.Writer {
+	if envBoolean(EnvVarLoggerLevelVerbose) {
+		return os.Stderr
+	}
+
+	return io.Discard
+}
+
 func main() {
+	log.SetOutput(getLoggerWriter())
+
 	log.Printf("using yarn-contained: %s\n", ProjectURL)
 
 	var err error
 
-	forceDockerRebuild = envBoolean(ForceDockerImageRebuildEnvVarName)
-	portForward = envString(DockerPortForwardVarName, "")
+	forceDockerRebuild = envBoolean(EnvVarForceDockerImageRebuild)
+	portForward = envString(EnvVarDockerPortForward, "")
 
 	dockerTool, err := getDockerTool()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
@@ -95,7 +111,7 @@ const (
 var containerApplications = []string{"podman", "docker"}
 
 func getEnvVarsToForward() []docker.EnvironmentVariable {
-	envVarNames := strings.Split(os.Getenv(EnvVarsToForwardVarName), ",")
+	envVarNames := strings.Split(os.Getenv(EnvVarForwardedEnvVars), ",")
 
 	var envVars []docker.EnvironmentVariable
 
@@ -117,7 +133,7 @@ func getEnvVarsToForward() []docker.EnvironmentVariable {
 }
 
 func getDockerTool() (string, errorsx.Error) {
-	chosenDockerTool := envString(DockerToolEnvVarName, "")
+	chosenDockerTool := envString(EnvVarDockerTool, "")
 	if chosenDockerTool != "" {
 		return chosenDockerTool, nil
 	}

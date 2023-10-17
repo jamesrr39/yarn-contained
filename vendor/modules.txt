@@ -1,6 +1,8 @@
+# github.com/jamesrr39/go-errorsx v0.0.0-20231017193647-f527414d9ae8
+## explicit; go 1.18
+github.com/jamesrr39/go-errorsx
 # github.com/jamesrr39/goutil v0.0.0-20220719103636-07a361ef6de7
 ## explicit; go 1.16
-github.com/jamesrr39/goutil/errorsx
 # github.com/joho/godotenv v1.5.1
 ## explicit; go 1.12
 github.com/joho/godotenv

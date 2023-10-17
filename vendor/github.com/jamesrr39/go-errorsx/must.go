@@ -1,10 +1,14 @@
 package errorsx
 
-import "log"
+import (
+	"fmt"
+	"os"
+)
 
 // ExitIfErr prints an error message and stack trace, and then exits the application if an error is passed in
 func ExitIfErr(err Error) {
 	if err != nil {
-		log.Fatalf("error: %s\nStack trace:\n%s\n", err.Error(), err.Stack())
+		fmt.Fprintf(os.Stderr, "error: %s\nStack trace:\n%s\n", err.Error(), err.Stack())
+		os.Exit(1)
 	}
 }

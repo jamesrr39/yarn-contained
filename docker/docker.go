@@ -11,7 +11,7 @@ import (
 	"os/user"
 	"strings"
 
-	"github.com/jamesrr39/goutil/errorsx"
+	"github.com/jamesrr39/go-errorsx"
 )
 
 var (
