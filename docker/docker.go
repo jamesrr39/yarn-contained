@@ -80,7 +80,7 @@ type EnvironmentVariable struct {
 	Key, Value string
 }
 
-func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []string, hostUser *user.User, portForward string, envVars []EnvironmentVariable) errorsx.Error {
+func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []string, hostUser *user.User, portForward string, envVars []EnvironmentVariable, extraContainerArgs []string) errorsx.Error {
 
 	dockerArgs := []string{
 		"run",
@@ -97,6 +97,8 @@ func (ds *DockerService) RunImage(imageName, workingDir string, yarnArgs []strin
 	if portForward != "" {
 		dockerArgs = append(dockerArgs, "-p", portForward)
 	}
+	dockerArgs = append(dockerArgs, extraContainerArgs...)
+
 	dockerArgs = append(dockerArgs, imageName, "yarn")
 	dockerArgs = append(dockerArgs, yarnArgs...)
 

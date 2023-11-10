@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -19,6 +20,7 @@ const (
 	EnvVarForceDockerImageRebuild = "YARN_CONTAINED_FORCE_DOCKER_BUILD"
 	EnvVarDockerTool              = "YARN_CONTAINED_DOCKERTOOL"
 	EnvVarDockerPortForward       = "YARN_CONTAINED_PORT_FORWARD"
+	EnvVarExtraContainerArgs      = "YARN_CONTAINED_EXTRA_CONTAINER_ARGS"
 	EnvVarForwardedEnvVars        = "YARN_CONTAINED_ENV_VARS" // comma separated, e.g. "NPM_TOKEN,AWS_SECRET_KEY"
 )
 
@@ -40,6 +42,20 @@ func getLoggerWriter() io.Writer {
 	return io.Discard
 }
 
+func trimSpaces(items []string) []string {
+	var out []string
+
+	for _, item := range items {
+		trimmed := strings.TrimSpace(item)
+		if trimmed == "" {
+			continue
+		}
+		out = append(out, trimmed)
+	}
+
+	return out
+}
+
 func main() {
 	log.SetOutput(getLoggerWriter())
 
@@ -49,6 +65,7 @@ func main() {
 
 	forceDockerRebuild = envBoolean(EnvVarForceDockerImageRebuild)
 	portForward = envString(EnvVarDockerPortForward, "")
+	extraContainerArgs := trimSpaces(strings.Split(envString(EnvVarExtraContainerArgs, ""), " "))
 
 	dockerTool, err := getDockerTool()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
@@ -72,7 +89,8 @@ func main() {
 		errorsx.ExitIfErr(err)
 
 		if !yarnLockExists {
-			log.Fatalf("%s does not exist in the current working directory and the command was not 'init'. Exiting.\n", packageJsonFilename)
+			fmt.Fprintf(os.Stderr, "%s does not exist in the current working directory and the command was not 'init'. Exiting.\n", packageJsonFilename)
+			os.Exit(1)
 		}
 	}
 
@@ -85,7 +103,7 @@ func main() {
 	hostUser, err := user.Current()
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 
-	err = dockerService.RunImage(DockerImageName, workingDir, yarnArgs, hostUser, portForward, getEnvVarsToForward())
+	err = dockerService.RunImage(DockerImageName, workingDir, yarnArgs, hostUser, portForward, getEnvVarsToForward(), extraContainerArgs)
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 }
 
