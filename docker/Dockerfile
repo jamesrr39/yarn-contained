@@ -1,7 +1,7 @@
-FROM alpine:3.18
+FROM alpine:latest
 
-RUN apk update
-RUN apk add --no-cache yarn nodejs runuser git
+RUN apk update && apk upgrade
+RUN apk add --update --no-cache yarn nodejs runuser git
 
 RUN mkdir -p /opt/yarn-contained/workspace
 
