@@ -13,3 +13,7 @@ remove_image:
 install:
 	go build -trimpath -o ${shell go env GOBIN}/yarn-contained yarn-contained.go
 	YARN_CONTAINED_FORCE_DOCKER_BUILD=1 yarn-contained --version
+
+.PHONY: release
+release:
+	GITHUB_TOKEN=${GORELEASER_YARN_CONTAINED_GITHUB_TOKEN} goreleaser release --clean --release-header ${GORELEASER_RELEASE_HEADER_FILEPATH}
