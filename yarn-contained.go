@@ -29,6 +29,8 @@ const (
 	ProjectURL      = "https://github.com/jamesrr39/yarn-contained"
 )
 
+var version string = "dev"
+
 var (
 	forceDockerRebuild bool
 	portForward        string
@@ -66,7 +68,7 @@ func exitIfErrWithoutStackTrace(err error) {
 func main() {
 	log.SetOutput(getLoggerWriter())
 
-	log.Printf("using yarn-contained: %s\n", ProjectURL)
+	log.Printf("using yarn-contained: %s, version %q\n", ProjectURL, version)
 
 	var err error
 
