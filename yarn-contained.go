@@ -56,6 +56,13 @@ func trimSpaces(items []string) []string {
 	return out
 }
 
+func exitIfErrWithoutStackTrace(err error) {
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
+}
+
 func main() {
 	log.SetOutput(getLoggerWriter())
 
@@ -104,7 +111,7 @@ func main() {
 	errorsx.ExitIfErr(errorsx.Wrap(err))
 
 	err = dockerService.RunImage(DockerImageName, workingDir, yarnArgs, hostUser, portForward, getEnvVarsToForward(), extraContainerArgs)
-	errorsx.ExitIfErr(errorsx.Wrap(err))
+	exitIfErrWithoutStackTrace(err)
 }
 
 func checkForPackageJson() (bool, errorsx.Error) {
