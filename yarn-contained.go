@@ -24,6 +24,15 @@ const (
 	EnvVarForwardedEnvVars        = "YARN_CONTAINED_ENV_VARS" // comma separated, e.g. "NPM_TOKEN,AWS_SECRET_KEY"
 )
 
+var envVars = []string{
+	EnvVarLoggerLevelVerbose,
+	EnvVarForceDockerImageRebuild,
+	EnvVarDockerTool,
+	EnvVarDockerPortForward,
+	EnvVarExtraContainerArgs,
+	EnvVarForwardedEnvVars,
+}
+
 const (
 	DockerImageName = "jamesrr39/yarncontained"
 	ProjectURL      = "https://github.com/jamesrr39/yarn-contained"
